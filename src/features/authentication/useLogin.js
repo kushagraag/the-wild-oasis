@@ -11,8 +11,9 @@ export function useLogin() {
     mutationFn: ({ email, password }) => loginAPI({ email, password }),
 
     onSuccess: (user) => {
-      // with below line, login can be done but stays on login page
-      // queryClient.setQueryData(["user"], user);
+      // problem was user has both session and user, so passing just user sets
+      // user data as null even though its authenticated (in useUser -> apiAuth)
+      queryClient.setQueryData(["user"], user.user);
       toast.success(`${user.user.email} successfully logged in`);
       navigate("/dashboard", { replace: true });
     },
