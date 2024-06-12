@@ -6,8 +6,13 @@ import Heading from "../../ui/Heading";
 import ButtonGroup from "../../ui/ButtonGroup";
 import Button from "../../ui/Button";
 import ButtonText from "../../ui/ButtonText";
-
+import Spinner from "../../ui/Spinner";
+import Checkbox from "../../ui/Checkbox";
+import useCheckin from "./useCheckin";
+import { formatCurrency } from "../../utils/helpers";
 import { useMoveBack } from "../../hooks/useMoveBack";
+import { useBooking } from "../bookings/useBooking";
+import { useEffect, useState } from "react";
 
 const Box = styled.div`
   /* Box */
@@ -18,10 +23,18 @@ const Box = styled.div`
 `;
 
 function CheckinBooking() {
+  const [confirmPaid, setConfirmPaid] = useState(false);
+  const { booking, isLoading } = useBooking();
+
+  useEffect(() => {
+    setConfirmPaid(booking?.isPaid || false);
+  }, [booking]);
+
   const moveBack = useMoveBack();
 
-  const booking = {};
+  const { checkin, isCheckinIn } = useCheckin();
 
+  if (!booking) return <Spinner />;
   const {
     id: bookingId,
     guests,
@@ -31,7 +44,11 @@ function CheckinBooking() {
     numNights,
   } = booking;
 
-  function handleCheckin() {}
+  function handleCheckin() {
+    if (!confirmPaid) return;
+
+    checkin(bookingId);
+  }
 
   return (
     <>
@@ -42,8 +59,22 @@ function CheckinBooking() {
 
       <BookingDataBox booking={booking} />
 
+      <Box>
+        <Checkbox
+          checked={confirmPaid}
+          onChange={() => setConfirmPaid((confirm) => !confirm)}
+          id="confirm"
+          disabled={confirmPaid || isCheckinIn}
+        >
+          I confirm that {guests.fullName} has paid the total amount of{" "}
+          {formatCurrency(totalPrice)}
+        </Checkbox>
+      </Box>
+
       <ButtonGroup>
-        <Button onClick={handleCheckin}>Check in booking #{bookingId}</Button>
+        <Button onClick={handleCheckin} disabled={!confirmPaid || isCheckinIn}>
+          Check in booking #{bookingId}
+        </Button>
         <Button variation="secondary" onClick={moveBack}>
           Back
         </Button>
