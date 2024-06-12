@@ -14,7 +14,7 @@ export function useLogin() {
       // with below line, login can be done but stays on login page
       // queryClient.setQueryData(["user"], user);
       toast.success(`${user.user.email} successfully logged in`);
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     },
 
     onError: (err) => {
