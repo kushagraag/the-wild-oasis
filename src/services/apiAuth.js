@@ -79,13 +79,12 @@ export async function updateCurrentUser({ password, fullName, avatar }) {
   }
 
   // 3. update avatar in user
-  const { data: updatedUser, error: uploadingError } = supabase.auth.updateUser(
-    {
+  const { data: updatedUser, error: uploadingError } =
+    await supabase.auth.updateUser({
       data: {
         avatar: `${supabaseUrl}/storage/v1/object/public/avatars/${fileName}`,
       },
-    }
-  );
+    });
   if (uploadingError) {
     throw new Error(uploadingError.message);
   }
