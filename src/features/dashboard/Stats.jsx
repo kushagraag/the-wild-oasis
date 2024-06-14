@@ -37,7 +37,7 @@ function Stats({ bookings, confirmedStays, numDays, cabinCount }) {
         title="Sales"
         color="green"
         icon={<HiOutlineBanknotes />}
-        value={formatCurrency(sales)}
+        value={formatCurrency(sales / 1000) + "K"}
       />
       <Stat
         title="Check ins"

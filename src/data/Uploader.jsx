@@ -59,8 +59,8 @@ async function createBookings() {
     const numNights = subtractDates(booking.endDate, booking.startDate);
     const cabinPrice = numNights * (cabin.regularPrice - cabin.discount);
     const extrasPrice = booking.hasBreakfast
-      ? numNights * 15 * booking.numGuests
-      : 0; // hardcoded breakfast price
+      ? numNights * 15 * 80 * booking.numGuests
+      : 0; // hardcoded breakfast price (to dollar)
     const totalPrice = cabinPrice + extrasPrice;
 
     let status;
