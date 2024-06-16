@@ -8,12 +8,15 @@ const StyledModal = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
+  /* max-height: 100vh; */
   transform: translate(-50%, -50%);
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 3.2rem 4rem;
   transition: all 0.5s;
+  max-height: 80vh; /* Set a maximum height for the modal */
+  overflow-y: auto; /* Enable vertical scrolling */
 `;
 
 const Overlay = styled.div`
