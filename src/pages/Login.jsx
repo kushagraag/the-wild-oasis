@@ -21,6 +21,7 @@ function Login() {
         Log in to you account
       </Heading>
       <LoginForm />
+      <p>use default given credentials</p>
     </LoginLayout>
   );
 }
