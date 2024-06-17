@@ -3,23 +3,25 @@ import { useForm } from "react-hook-form";
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
-import FileInput from "../../ui/FileInput";
-import Textarea from "../../ui/Textarea";
 import FormRow from "../../ui/FormRow";
 import { useCreateCabin } from "./useCreateBooking";
 import { useEditCabin } from "./useEditBooking";
-import Checkbox from "../../ui/Checkbox";
-import { useCabins } from "../cabins/useCabins";
-import { useBookings } from "./useBookings";
 import { useRangeBookings } from "./useRangeBookings";
+import { useSearchParams } from "react-router-dom";
+import { formatStartEndDates } from "../../utils/helpers";
 
 function CreateBookingForm({ cabinToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
 
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
-    defaultValues: isEditSession ? editValues : {},
-  });
+  const { register, handleSubmit, watch, reset, getValues, formState } =
+    useForm({
+      defaultValues: isEditSession ? editValues : {},
+    });
+
+  const startDate = watch("startDate");
+  const endDate = watch("endDate");
+
   const { errors } = formState;
   // console.log(errors);
 
@@ -27,8 +29,8 @@ function CreateBookingForm({ cabinToEdit = {}, onCloseModal }) {
 
   const { editCabin, isEditing } = useEditCabin();
 
-  // const { data: rangeBookings, isLoading: isRangeBookingsLoading } =
-  //   useRangeBookings();
+  const { availableCabins, isLoading: isRangeBookingsLoading } =
+    useRangeBookings();
 
   const isWorking = isCreating || isEditing;
 
@@ -54,23 +56,21 @@ function CreateBookingForm({ cabinToEdit = {}, onCloseModal }) {
     //   }
     // );
     else {
-      // formatStartEndDates();
-      console.log(data, formatStartEndDates());
+      console.log(data);
     }
   }
 
-  function formatStartEndDates() {
-    const { startDate, endDate } = getValues();
-    const formattedStartDate = new Date(startDate)
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
-    const formattedEndDate = new Date(endDate)
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
+  const [searchParams, setSearchParams] = useSearchParams();
 
-    return { formattedStartDate, formattedEndDate };
+  function handleDateChange() {
+    const { formattedStartDate, formattedEndDate } = formatStartEndDates(
+      getValues().startDate,
+      getValues().endDate
+    );
+    searchParams.set("startDate", formattedStartDate);
+    setSearchParams(searchParams);
+    searchParams.set("endDate", formattedEndDate);
+    setSearchParams(searchParams);
   }
 
   function onError(errors) {
@@ -92,7 +92,7 @@ function CreateBookingForm({ cabinToEdit = {}, onCloseModal }) {
     return `${year}-${month}-${day}`;
   }
 
-  // console.log(rangeBookings(formatStartEndDates()));
+  console.log("range", availableCabins);
 
   return (
     <Form
@@ -109,6 +109,7 @@ function CreateBookingForm({ cabinToEdit = {}, onCloseModal }) {
           {...register("startDate", {
             required: "This field is required",
             valueAsDate: true,
+            onChange: () => handleDateChange(),
           })}
         />
       </FormRow>
@@ -123,10 +124,12 @@ function CreateBookingForm({ cabinToEdit = {}, onCloseModal }) {
             required: "This field is required",
             valueAsDate: true,
             validate: (value) => value > getValues().startDate,
+            onChange: () => handleDateChange(),
           })}
         />
       </FormRow>
       {/* fetch available cabins and populate */}
+
       <FormRow label={"Cabins"} error={errors?.name?.message}>
         <select
           {...register("cabinId", { required: "This field is required" })}

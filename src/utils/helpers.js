@@ -29,3 +29,16 @@ export const formatCurrency = (value) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(
     value
   );
+
+export const formatStartEndDates = (startDate, endDate) => {
+  const formattedStartDate = new Date(startDate)
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+  const formattedEndDate = new Date(endDate)
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+
+  return { formattedStartDate, formattedEndDate };
+};
